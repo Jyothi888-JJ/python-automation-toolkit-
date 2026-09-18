@@ -1,53 +1,95 @@
-Weather-Based Autoscaler Script
-This repository contains a Python script that continuously checks the current weather conditions for a specified city using the WeatherAPI service. If severe weather (e.g., Heavy Rain) is detected, it automatically scales up a Kubernetes deployment to handle potential surges in traffic or load.
+# Auto-Scaling Kubernetes Pods Based on Weather API
 
-📋 Features
-Weather Data Fetching: Integrates with WeatherAPI to fetch real-time weather conditions in JSON format.
+This project demonstrates a simple **Python automation script** that checks the current weather using the WeatherAPI and automatically scales a Kubernetes deployment when **Heavy Rain** is detected.
 
-Automated Scaling: Uses Python's subprocess module to execute kubectl commands.
+## What This Script Does
 
-Dynamic Capacity Management: Automatically adjusts Kubernetes deployment replicas based on defined weather triggers.
+1. Calls the **WeatherAPI** to get the current weather.
+2. Reads the current weather condition.
+3. Checks whether the condition is **Heavy Rain**.
+4. If Heavy Rain is detected, it scales the Kubernetes deployment to **3 replicas**.
+5. Otherwise, no scaling is performed.
 
-🛠️ Prerequisites
-Before running the script, ensure you have the following installed and configured:
+## Technologies Used
 
-Python 3.x
+* Python
+* WeatherAPI
+* Kubernetes
+* `kubectl`
+* Python `requests` module
+* Python `subprocess` module
 
-requests Library: Install via pip:
+## How It Works
 
-Bash
+```text
+Python Script
+     ↓
+WeatherAPI
+     ↓
+Get Current Weather
+     ↓
+Is it Heavy Rain?
+   ↙           ↘
+ Yes            No
+  ↓              ↓
+Scale Pods     No Scaling
+to 3 Replicas
+```
+
+## Setup
+
+### 1. Install the Python dependency
+
+```bash
 pip install requests
-kubectl CLI: Installed and configured with context access to your target Kubernetes cluster.
+```
 
-WeatherAPI Key: A free or paid API key from WeatherAPI.
+### 2. Add your WeatherAPI key
 
-⚙️ Configuration & Setup
-Clone the repository:
+Replace:
 
-Bash
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
-Configure Variables:
-Open main.py (or your script file) and replace the placeholder values:
+```python
+API_KEY = "YOUR_WEATHER_API_KEY"
+```
 
-Set API_KEY to your valid WeatherAPI key.
+with your actual WeatherAPI key.
 
-Set CITY to your target location.
+### 3. Make sure Kubernetes is running
 
-Ensure the deployment name (blogging-app) matches your target Kubernetes deployment.
+The script expects a Kubernetes deployment named:
 
-Python
-API_KEY = "YOUR_ACTUAL_WEATHER_API_KEY"
-CITY = "London"
-🚀 Usage
-Run the script directly from your terminal:
+```text
+blogging-app
+```
 
-Bash
-python main.py
-Script Workflow:
-Normal Conditions: If the weather condition does not contain "Heavy Rain", the script outputs a normal weather log and exits without changing cluster state.
+You can verify it with:
 
-Heavy Rain Detected: If "Heavy Rain" is present in the weather payload, the script runs:
+```bash
+kubectl get deployments
+```
 
-Bash
-kubectl scale deployment blogging-app --replicas=3
+### 4. Run the script
+
+```bash
+python weather_autoscaling.py
+```
+
+## Example Output
+
+### Heavy Rain
+
+```text
+Weather in London is Heavy Rain
+Scaling up Kubernetes pods to 3 due to heavy rain...
+```
+
+### Normal Weather
+
+```text
+Weather in London is Sunny
+Weather condition normal. No scaling required.
+```
+
+## Purpose
+
+This project demonstrates how **Python can be used to automate Kubernetes operations** by combining an external API with the `kubectl` command.
